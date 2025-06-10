@@ -1,3 +1,3 @@
-Flask
-nexmo
+Flask==2.3.3
+nexmo  # Install the latest stable version
 gunicorn
