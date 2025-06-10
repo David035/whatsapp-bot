@@ -6,9 +6,9 @@ app = Flask(__name__)
 
 # Configura las credenciales de Vonage desde variables de entorno
 # Es una buena práctica no poner las claves directamente en el código
-VONAGE_API_KEY = os.getenv('f9953d1d')
-VONAGE_API_SECRET = os.getenv('RRNs89KW6rG7qZAx')
-VONAGE_BRAND_NAME = os.getenv('34649586273') # Tu número de Vonage/WhatsApp Business ID
+VONAGE_API_KEY = os.getenv('VONAGE_API_KEY')
+VONAGE_API_SECRET = os.getenv('VONAGE_API_SECRET')
+VONAGE_BRAND_NAME = os.getenv('VONAGE_BRAND_NAME') # Tu número de Vonage/WhatsApp Business ID
 
 # Inicializa el cliente de Vonage
 client = vonage.Client(key=VONAGE_API_KEY, secret=VONAGE_API_SECRET)
