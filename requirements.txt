@@ -1,3 +1,3 @@
-Flask==2.3.3 # O la versión más reciente que prefieras
-nexmo==2.5.2 # La librería oficial de Vonage para Python
+Flask==2.3.3
+nexmo==2.5.2
 gunicorn
