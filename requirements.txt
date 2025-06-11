@@ -1,3 +1,2 @@
 Flask==2.3.3
 gunicorn
-vonage==4.4.3
