@@ -49,7 +49,7 @@ def inbound():
         except Exception as e:
             print(f"❌ Error al enviar mensaje: {e}.  Verifica que VONAGE_BRAND_NAME esté configurado correctamente.")
     else:
-        print(⚠️ No se pudo procesar el mensaje: faltan datos 'from' o 'text'.")
+        print(No se pudo procesar el mensaje: faltan datos 'from' o 'text'.")
 
     return "OK", 200
 
