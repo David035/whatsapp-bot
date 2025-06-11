@@ -3,7 +3,7 @@ from flask import Flask, request
 import vonage
 print("🔍 vonage se está cargando desde:", vonage.__file__)
 
-app = Flask(__name__)
+main = Flask(__name__)
 
 # 🔐 Lee las claves desde variables de entorno
 VONAGE_API_KEY = os.environ.get("VONAGE_API_KEY")
@@ -13,7 +13,7 @@ VONAGE_API_SECRET = os.environ.get("VONAGE_API_SECRET")
 client = vonage.Client(key=VONAGE_API_KEY, secret=VONAGE_API_SECRET)
 messaging = vonage.Messaging(client)
 
-@app.route('/webhook/inbound', methods=['POST'])
+@main.route('/webhook/inbound', methods=['POST'])
 def inbound():
     data = request.json
     print("📥 Mensaje recibido:", data)
@@ -33,16 +33,16 @@ def inbound():
 
     return "OK", 200
 
-@app.route('/webhook/status', methods=['POST'])
+@main.route('/webhook/status', methods=['POST'])
 def status():
     data = request.json
     print("📈 Estado del mensaje:", data)
     return "OK", 200
 
-@app.route('/')
+@main.route('/')
 def home():
     return "Bot de WhatsApp con Vonage activo", 200
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    main.run(host="0.0.0.0", port=port)
