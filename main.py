@@ -1,21 +1,23 @@
 import os
 from flask import Flask, request
-import vonage
+import vonage # Importa vonage como el módulo principal
 
 main = Flask(__name__)
 
 # 🔐 Variables de entorno
 VONAGE_API_KEY = os.environ.get("VONAGE_API_KEY")
 VONAGE_API_SECRET = os.environ.get("VONAGE_API_SECRET")
-VONAGE_BRAND_NAME = os.environ.get("VONAGE_BRAND_NAME")
+VONAGE_BRAND_NAME = os.environ.get("VONAGE_BRAND_NAME") # Puede que lo uses como 'from' en tus mensajes
 
 # 🧠 Mostrar de dónde se carga la librería
 print("🔍 vonage se carga desde:", vonage.__file__)
 
 # 🚀 Inicializar cliente y sistema de mensajería
 try:
+    # La inicialización ha cambiado para la versión más reciente de la librería
+    # Ahora el cliente se inicializa directamente con vonage.Client
     client = vonage.Client(key=VONAGE_API_KEY, secret=VONAGE_API_SECRET)
-    messaging = vonage.Messaging(client)
+    # La forma de enviar mensajes también ha cambiado, se hace a través de client.messages
     print("✅ Cliente de Vonage inicializado.")
 except Exception as e:
     print(f"❌ Error inicializando Vonage: {e}")
@@ -27,11 +29,11 @@ def inbound():
     print("📥 Mensaje recibido:", data)
 
     sender = data.get("from")
-    message = data.get("text")
+    message_body = data.get("message", {}).get("content", {}).get("text") # Acceso más robusto al texto del mensaje
 
-    if sender and message and VONAGE_BRAND_NAME:
+    if sender and message_body and VONAGE_BRAND_NAME:
         # 🧠 Lógica básica del bot
-        text = message.lower()
+        text = message_body.lower()
         if "hola" in text:
             response = "¡Hola! Soy tu bot 🤖. ¿En qué puedo ayudarte?"
         elif "ayuda" in text:
@@ -40,12 +42,13 @@ def inbound():
             response = "No entendí bien. Escribe 'ayuda' para ver opciones."
 
         try:
-            messaging.send_message({
+            # Envío de mensaje usando client.messages.send_message
+            client.messages.send_message({
                 "channel": "whatsapp",
                 "to": sender,
                 "from": VONAGE_BRAND_NAME,
                 "message_type": "text",
-                "text": {"body": response}
+                "text": response # El texto del mensaje se pasa directamente
             })
             print("📤 Mensaje enviado.")
         except Exception as e:
