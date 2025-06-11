@@ -8,6 +8,11 @@ print("🔍 vonage se está cargando desde:", vonage.__file__)
 # Crea la instancia de la aplicación Flask
 main = Flask(__name__)
 
+client = vonage.VonageClient(
+    api_key=VONAGE_API_KEY,
+    api_secret=VONAGE_API_SECRET
+)
+
 # --- Configuración de Credenciales de Vonage (desde Variables de Entorno) ---
 # ¡IMPORTANTE!: Estas variables DEBEN estar configuradas en Render.
 # NUNCA incluyas tus claves directamente en el código para producción.
