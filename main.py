@@ -1,8 +1,12 @@
-import vonage
-print("📦 vonage se carga desde:", vonage.__file__)
+import os
+from flask import Flask
 
-try:
-    client = vonage.Client(key="dummy", secret="dummy")
-    print("✅ vonage.Client disponible")
-except AttributeError as e:
-    print(f"❌ vonage.Client no está disponible: {e}")
+main = Flask(__name__)
+
+@main.route("/")
+def index():
+    return "✅ main.py funciona correctamente", 200
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    main.run(host="0.0.0.0", port=port)
