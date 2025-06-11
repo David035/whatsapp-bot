@@ -10,7 +10,7 @@ main = Flask(__name__) # Renamed app to main, consistent with your code
 # It's crucial these are set in Render's environment variables, NOT hardcoded.
 VONAGE_API_KEY = os.environ.get("VONAGE_API_KEY")
 VONAGE_API_SECRET = os.environ.get("VONAGE_API_SECRET")
-VONAGE_BRAND_NAME = os.environ.get("34649586273") # Your Vonage WhatsApp Business ID (e.g., "34612345678")
+VONAGE_BRAND_NAME = os.environ.get("VONAGE_BRAND_NAME") # Your Vonage WhatsApp Business ID (e.g., "34612345678")
 
 # Initialize the Vonage client
 try:
@@ -51,7 +51,7 @@ def inbound():
         except Exception as e:
             print(f"❌ Error al enviar mensaje: {e}")
     else:
-        print(⚠️ No se pudo procesar el mensaje: faltan datos o VONAGE_BRAND_NAME no está configurado.")
+        print(No se pudo procesar el mensaje: faltan datos o VONAGE_BRAND_NAME no está configurado.")
 
     return "OK", 200
 
