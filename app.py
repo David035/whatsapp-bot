@@ -15,10 +15,10 @@ def inbound():
     data = request.json
     print("📥 Mensaje recibido:", data)
 
-    sender = data.get("from")  # ejemplo: 'whatsapp:+34600000000'
+    sender = data.get("from")  # ejemplo: 'whatsapp:+34649586273'
     if sender:
         response = whatsapp.send_message({
-            "from": "whatsapp:+1415XXXXXXX",  # Número del sandbox
+            "from": "whatsapp:+14157386102",  # Número del sandbox
             "to": sender,
             "message_type": "text",
             "text": {
