@@ -1,96 +1,75 @@
 import os
-from flask import Flask, request, jsonify
+from flask import Flask, request
 import vonage
 
-# Esto es para depuración: imprime la ruta de donde se carga el módulo 'vonage'
+# 📍 Muestra desde dónde se carga la librería vonage
 print("🔍 vonage se está cargando desde:", vonage.__file__)
 
-# Crea la instancia de la aplicación Flask
-main = Flask(__name__)
-
-client = vonage.Client(
-    api_key=VONAGE_API_KEY,
-    api_secret=VONAGE_API_SECRET
-)
-
-# --- Configuración de Credenciales de Vonage (desde Variables de Entorno) ---
-# ¡IMPORTANTE!: Estas variables DEBEN estar configuradas en Render.
-# NUNCA incluyas tus claves directamente en el código para producción.
+# 🔐 Cargar credenciales desde variables de entorno
 VONAGE_API_KEY = os.environ.get("VONAGE_API_KEY")
 VONAGE_API_SECRET = os.environ.get("VONAGE_API_SECRET")
-# Tu Vonage WhatsApp Business ID (el número que Vonage te asigna, sin el '+')
-VONAGE_BRAND_NAME = os.environ.get("VONAGE_BRAND_NAME")
+VONAGE_BRAND_NAME = os.environ.get("VONAGE_BRAND_NAME")  # WhatsApp Business ID
 
-# Inicializa el cliente de Vonage con la sintaxis de la versión 3.x.x+
+# Inicializar cliente Vonage
 try:
     client = vonage.Client(key=VONAGE_API_KEY, secret=VONAGE_API_SECRET)
     messaging = vonage.Messaging(client)
     print("✅ Cliente de Vonage inicializado correctamente.")
 except Exception as e:
-    print(f"❌ Error al inicializar cliente de Vonage: {e}")# --- Rutas de la Aplicación Flask ---
+    print(f"❌ Error al inicializar cliente de Vonage: {e}")
 
+# Inicializar Flask
+main = Flask(__name__)
+
+# 📥 Endpoint para recibir mensajes entrantes de WhatsApp
 @main.route('/webhook/inbound', methods=['POST'])
 def inbound():
-    """
-    Este endpoint recibe los mensajes entrantes de WhatsApp de Vonage.
-    """
     data = request.json
     print("📥 Mensaje recibido:", data)
 
-    sender_number = data.get("from") # El número de WhatsApp del usuario
-    message_text = data.get("text")   # El texto del mensaje del usuario
+    sender = data.get("from")
+    message = data.get("text")
 
-    # Asegúrate de que tenemos el número del remitente, el texto del mensaje y tu VONAGE_BRAND_NAME configurado
-    if sender_number and message_text and VONAGE_BRAND_NAME:
-        print(f"Mensaje de {sender_number}: \"{message_text}\"")
+    if sender and message and VONAGE_BRAND_NAME:
+        message_lower = message.lower()
+        response_text = "Hola, soy un bot 🤖. ¿En qué puedo ayudarte?"
 
-        # Lógica de respuesta básica del bot
-        response_message = "Hola, soy un bot 🤖. ¿En qué puedo ayudarte?"
-        if "hola" in message_text.lower():
-            response_message = "¡Hola! ¿Cómo estás? Soy tu bot de WhatsApp."
-        elif "ayuda" in message_text.lower():
-            response_message = "Claro, puedo ayudarte con información básica. Intenta preguntar por 'horarios' o 'contacto'."
+        if "hola" in message_lower:
+            response_text = "¡Hola! ¿Cómo estás? Soy tu bot de WhatsApp."
+        elif "ayuda" in message_lower:
+            response_text = "Puedo ayudarte con horarios, contacto, o preguntas básicas."
 
         try:
-            # Envía el mensaje de respuesta de vuelta al usuario usando la API de Messages
             messaging.send_message({
                 "channel": "whatsapp",
-                "to": sender_number,
+                "to": sender,
                 "from": VONAGE_BRAND_NAME,
                 "message_type": "text",
-                "text": response_message
+                "text": {
+                    "body": response_text
+                }
             })
             print("📤 Respuesta enviada.")
         except Exception as e:
-            # Este error indica un problema al enviar el mensaje (ej. VONAGE_BRAND_NAME incorrecto)
-            print(f"❌ Error al enviar mensaje: {e}. Verifica que VONAGE_BRAND_NAME esté configurado correctamente y que el número de 'from' sea válido para tu cuenta de Vonage.")
+            print(f"❌ Error al enviar mensaje: {e}")
     else:
-        # Esto ocurre si el JSON entrante no tiene 'from' o 'text', o si VONAGE_BRAND_NAME no se cargó.
-        print("⚠️ No se pudo procesar el mensaje: faltan datos 'from' o 'text' o VONAGE_BRAND_NAME no está configurado en el entorno.")
+        print("⚠️ Faltan datos: 'from', 'text' o VONAGE_BRAND_NAME.")
 
-    return "OK", 200 # Siempre devuelve OK a Vonage para confirmar la recepción del webhook
+    return "OK", 200
 
+# 📈 Endpoint para recibir actualizaciones de estado de los mensajes
 @main.route('/webhook/status', methods=['POST'])
 def status():
-    """
-    Este endpoint recibe actualizaciones de estado de los mensajes que envías
-    (ej. entregado, leído, fallido). Útil para monitorear.
-    """
     data = request.json
     print("📈 Estado del mensaje:", data)
     return "OK", 200
 
+# Ruta de inicio para verificar que el bot está activo
 @main.route('/')
 def home():
-    """
-    La ruta raíz. Render la usa para comprobar que tu servicio está activo.
-    """
     return "Bot de WhatsApp con Vonage activo y esperando webhooks.", 200
 
-# --- Inicio del Servidor Flask (para desarrollo local o Gunicorn en producción) ---
+# Iniciar servidor Flask (usado localmente)
 if __name__ == "__main__":
-    # Obtiene el puerto del entorno (Render lo proveerá) o usa 5000 por defecto
     port = int(os.environ.get("PORT", 5000))
-    print(f"🚀 Iniciando bot localmente en http://0.0.0.0:{port}")
-    # debug=True es solo para desarrollo local, no recomendado en producción
     main.run(host="0.0.0.0", port=port, debug=True)
