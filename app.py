@@ -1,6 +1,7 @@
 import os
-import vonage
-print("✅ Versión del SDK Vonage:", vonage.__version__)
+import vonage._version
+print("✅ Versión real del SDK Vonage:", vonage._version.__version__)
+
 
 from flask import Flask, request
 from vonage import Client, Messaging
