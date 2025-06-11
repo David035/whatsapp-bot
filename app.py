@@ -1,10 +1,11 @@
+import os
 from flask import Flask, request
 from vonage import Client, Messaging
 
 app = Flask(__name__)
 
-VONAGE_API_KEY = "f9953d1d"
-VONAGE_API_SECRET = "RRNs89KW6rG7qZAx"
+VONAGE_API_KEY = os.environ.get("VONAGE_API_KEY")
+VONAGE_API_SECRET = os.environ.get("VONAGE_API_SECRET")
 
 client = Client(key=VONAGE_API_KEY, secret=VONAGE_API_SECRET)
 whatsapp = Messaging(client)
