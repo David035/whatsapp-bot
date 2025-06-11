@@ -1,18 +1,16 @@
 import os
-import vonage._version
-print("✅ Versión real del SDK Vonage:", vonage._version.__version__)
-
-
 from flask import Flask, request
-from vonage import Client, Messaging
+import vonage
 
 app = Flask(__name__)
 
+# 🔐 Lee las claves desde variables de entorno
 VONAGE_API_KEY = os.environ.get("VONAGE_API_KEY")
 VONAGE_API_SECRET = os.environ.get("VONAGE_API_SECRET")
 
-client = Client(key=VONAGE_API_KEY, secret=VONAGE_API_SECRET)
-whatsapp = Messaging(client)
+# ✅ Crear cliente y mensajería (válido en Vonage >= 3.0)
+client = vonage.Client(key=VONAGE_API_KEY, secret=VONAGE_API_SECRET)
+messaging = vonage.Messaging(client)
 
 @app.route('/webhook/inbound', methods=['POST'])
 def inbound():
@@ -21,8 +19,8 @@ def inbound():
 
     sender = data.get("from")
     if sender:
-        response = whatsapp.send_message({
-            "from": "whatsapp:+14157386102",
+        response = messaging.send_message({
+            "from": "whatsapp:+14157386102",  # Tu número del sandbox
             "to": sender,
             "message_type": "text",
             "text": {
@@ -47,4 +45,3 @@ def home():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-
