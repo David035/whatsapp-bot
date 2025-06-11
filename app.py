@@ -1,29 +1,29 @@
 from flask import Flask, request
-import vonage
+from vonage import Client, Messaging
 
 app = Flask(__name__)
 
-# 🔐 Tu clave y secreto de Vonage
-VONAGE_API_KEY = "tu_api_key"
-VONAGE_API_SECRET = "tu_api_secret"
+VONAGE_API_KEY = "f9953d1d"
+VONAGE_API_SECRET = "RRNs89KW6rG7qZAx"
 
-client = vonage.Client(key=VONAGE_API_KEY, secret=VONAGE_API_SECRET)
-whatsapp = vonage.Messages(client)
+client = Client(key=VONAGE_API_KEY, secret=VONAGE_API_SECRET)
+whatsapp = Messaging(client)
 
 @app.route('/webhook/inbound', methods=['POST'])
 def inbound():
     data = request.json
     print("📥 Mensaje recibido:", data)
 
-    sender = data.get("from")  # ejemplo: 'whatsapp:+34649586273'
+    sender = data.get("from")
     if sender:
         response = whatsapp.send_message({
-            "from": "whatsapp:+14157386102",  # Número del sandbox
+            "from": "whatsapp:+14157386102",
             "to": sender,
             "message_type": "text",
             "text": {
                 "body": "Hola, soy un bot 🤖. ¿En qué puedo ayudarte?"
-            }
+            },
+            "channel": "whatsapp"
         })
         print("📤 Respuesta enviada:", response)
 
