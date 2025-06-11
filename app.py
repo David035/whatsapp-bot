@@ -8,7 +8,7 @@ print("🔍 vonage se está cargando desde:", vonage.__file__)
 # Crea la instancia de la aplicación Flask
 main = Flask(__name__)
 
-client = vonage.VonageClient(
+client = vonage.Client(
     api_key=VONAGE_API_KEY,
     api_secret=VONAGE_API_SECRET
 )
@@ -23,16 +23,11 @@ VONAGE_BRAND_NAME = os.environ.get("VONAGE_BRAND_NAME")
 
 # Inicializa el cliente de Vonage con la sintaxis de la versión 3.x.x+
 try:
-    client = vonage.VonageClient(
-        api_key=VONAGE_API_KEY,
-        api_secret=VONAGE_API_SECRET
-    )
-    print("✅ Cliente de Vonage inicializado correctamente con la nueva sintaxis.")
+    client = vonage.Client(key=VONAGE_API_KEY, secret=VONAGE_API_SECRET)
+    messaging = vonage.Messaging(client)
+    print("✅ Cliente de Vonage inicializado correctamente.")
 except Exception as e:
-    # Si este error persiste, tu aplicación no podrá comunicarse con Vonage.
-    print(f"❌ Error al inicializar cliente de Vonage: {e}. Asegúrate de que VONAGE_API_KEY y VONAGE_API_SECRET estén configurados y sean correctos.")
-
-# --- Rutas de la Aplicación Flask ---
+    print(f"❌ Error al inicializar cliente de Vonage: {e}")# --- Rutas de la Aplicación Flask ---
 
 @main.route('/webhook/inbound', methods=['POST'])
 def inbound():
@@ -58,7 +53,7 @@ def inbound():
 
         try:
             # Envía el mensaje de respuesta de vuelta al usuario usando la API de Messages
-            client.messages.send_message({
+            messaging.send_message({
                 "channel": "whatsapp",
                 "to": sender_number,
                 "from": VONAGE_BRAND_NAME,
