@@ -1,6 +1,7 @@
 import os
 from flask import Flask, request
 import vonage
+print("🔍 vonage se está cargando desde:", vonage.__file__)
 
 app = Flask(__name__)
 
