@@ -29,6 +29,11 @@ except Exception as e:
 # Inicialización del Cliente Vonage
 # -----------------------------------------------------------------------------
 try:
+    # --- LÍNEA DE DEPURACIÓN AÑADIDA ---
+    # Esto imprimirá todos los atributos disponibles en el módulo 'vonage'
+    print(f"👀 Atributos disponibles en el módulo 'vonage' antes de inicializar cliente: {dir(vonage)}")
+    # --- FIN LÍNEA DE DEPURACIÓN ---
+
     # Esta línea es correcta para la versión moderna del SDK de Vonage (3.x.x o superior)
     # Se inicializa el cliente con la API Key y Secret
     client = vonage.Client(key=VONAGE_API_KEY, secret=VONAGE_API_SECRET)
