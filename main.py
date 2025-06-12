@@ -1,22 +1,25 @@
-import os
-from flask import Flask, request
+import pkg_resources
 import vonage
-import pkg_resources # Add this import!
+import sys
 
-main = Flask(__name__)
+print("--- Verificación de la librería 'vonage' ---")
 
-# ... (your existing code)
-
-# 🧠 Mostrar de dónde se carga la librería
-print("🔍 vonage se carga desde:", vonage.__file__)
-
+# Intenta obtener la versión de la librería 'vonage'
 try:
     vonage_version = pkg_resources.get_distribution("vonage").version
-    print(f"📦 Versión de la librería 'vonage' instalada y cargada: {vonage_version}")
+    print(f"📦 Versión de la librería 'vonage' instalada: {vonage_version}")
+except pkg_resources.DistributionNotFound:
+    print("❌ La librería 'vonage' no parece estar instalada en este entorno.")
+    print("Asegúrate de ejecutar 'pip install vonage' o 'pip install -r requirements.txt'.")
+    sys.exit(1) # Salir si no está instalada
 except Exception as e:
-    print(f"❌ No se pudo obtener la versión de 'vonage' en tiempo de ejecución: {e}")
+    print(f"❌ Error al intentar obtener la versión de 'vonage': {e}")
+    sys.exit(1)
 
-# 🚀 Inicializar cliente y sistema de mensajería
+# Muestra la ruta desde donde se carga la librería
 try:
-    client = vonage.Client(key=VONAGE_API_KEY, secret=VONAGE_API_SECRET)
-    # ... (rest of your Vonage initialization and logic)
+    print(f"🔍 'vonage' se carga desde: {vonage.__file__}")
+except AttributeError:
+    print("❌ No se pudo determinar la ruta de carga de 'vonage'.")
+
+print("--- Fin de la verificación ---")
