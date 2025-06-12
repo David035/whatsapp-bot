@@ -12,10 +12,10 @@ VONAGE_BRAND_NAME = os.environ.get("VONAGE_BRAND_NAME")
 # 🧠 Mostrar de dónde se carga la librería
 print("🔍 vonage se carga desde:", vonage.__file__)
 
-# 🚀 Inicializar cliente y sistema de mensajería
+# 🚀 Inicializar cliente de Vonage
 try:
+    # Esta línea es correcta para la versión moderna del SDK
     client = vonage.Client(key=VONAGE_API_KEY, secret=VONAGE_API_SECRET)
-    messaging = vonage.Messaging(client)
     print("✅ Cliente de Vonage inicializado.")
 except Exception as e:
     print(f"❌ Error inicializando Vonage: {e}")
@@ -27,11 +27,13 @@ def inbound():
     print("📥 Mensaje recibido:", data)
 
     sender = data.get("from")
-    message = data.get("text")
+    # ✅ CAMBIO CLAVE: Acceso más robusto al texto del mensaje para webhooks de WhatsApp
+    # El texto suele venir en data['message']['content']['text']
+    message_body = data.get("message", {}).get("content", {}).get("text")
 
-    if sender and message and VONAGE_BRAND_NAME:
+    if sender and message_body and VONAGE_BRAND_NAME:
         # 🧠 Lógica básica del bot
-        text = message.lower()
+        text = message_body.lower()
         if "hola" in text:
             response = "¡Hola! Soy tu bot 🤖. ¿En qué puedo ayudarte?"
         elif "ayuda" in text:
@@ -40,18 +42,19 @@ def inbound():
             response = "No entendí bien. Escribe 'ayuda' para ver opciones."
 
         try:
-            messaging.send_message({
+            # ✅ CAMBIO CLAVE: Llamada para enviar el mensaje usando client.messages
+            client.messages.send_message({
                 "channel": "whatsapp",
                 "to": sender,
                 "from": VONAGE_BRAND_NAME,
                 "message_type": "text",
-                "text": {"body": response}
+                "text": response # El texto del mensaje se pasa directamente
             })
             print("📤 Mensaje enviado.")
         except Exception as e:
             print(f"❌ Error al enviar el mensaje: {e}")
     else:
-        print("⚠️ Faltan datos: sender, text o VONAGE_BRAND_NAME.")
+        print("⚠️ Faltan datos: sender, message_body o VONAGE_BRAND_NAME.")
 
     return "OK", 200
 
@@ -62,7 +65,7 @@ def status():
     print("📈 Estado del mensaje:", data)
     return "OK", 200
 
-# 🌐 Ruta principal para Render
+# 🌐 Ruta principal para Render (o cualquier despliegue web)
 @main.route("/")
 def home():
     return "Bot de WhatsApp con Vonage activo y esperando webhooks.", 200
