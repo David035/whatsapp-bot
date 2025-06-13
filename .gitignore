@@ -1,3 +1,0 @@
-# Ignorar archivos de entorno y claves privadas
-.env
-private.key
