@@ -62,3 +62,11 @@ def home():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
+client.messages.send_message({
+    "channel": "whatsapp",
+    "to": "34649586273",  # posa el teu número verificat com a destinatari
+    "from": "14157386170",  # el número que Vonage t’ha donat
+    "message_type": "text",
+    "text": "Prova directa del bot 🤖"
+})
